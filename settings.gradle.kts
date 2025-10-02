@@ -1,1 +1,1 @@
-rootProject.name = "kube"
+rootProject.name = "spring-boot-k8s"
