@@ -14,9 +14,12 @@ class HelloController {
     @Value("\${http.client.host}")
     lateinit var host: String
 
+    @Value("\${database.password}")
+    lateinit var dbPass: String
+
     @GetMapping("/")
     fun index(): String {
-        return "Greetings from $appName"
+        return "Greetings from $appName | DB_PASSWORD=$dbPass"
     }
 
     @GetMapping("/call-service")

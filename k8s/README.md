@@ -67,4 +67,11 @@ curl 127.0.0.1:6666
 # 2.2 OR minikube service (opens a tunnel)
 minikube service -n test demo --url # service is the name of the SERVICE not a pod (checkout output of `k get service -n=test`)
 curl 127.0.0.1:{random-port-from-minikube-service-command} 
+
+# 2.3 WITH ingress (nginx)
+# start tunnel
+minikube tunnel
+# in another terminal window
+# it hits 127.0.0.1 (on default 80 port) and in k8s the post is still http://hello-world.example
+curl --resolve "hello-world.example:80:127.0.0.1" -i http://hello-world.example
 ```

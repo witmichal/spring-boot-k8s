@@ -1,7 +1,10 @@
 spring:
   application:
-    name: kube-a
+    name: kube-a-local
 
 http:
   client:
     host: jetbrains.com # fixme
+
+database:
+  password: "${DB_PASSWORD}"
