@@ -10,20 +10,6 @@ set -e
 # create namespace
 kubectl create namespace test
 
-SERVICE_NAME="kube-a" # supporting 'kube-b' without helm chart / `kustomization` would be a hell of an issue
-
-# create configmap - manually (will improve with helm chart later)
-rm -f app_config.yaml app_config.json
-RAW_YAML_FROM_GH="https://raw.githubusercontent.com/witmichal/spring-boot-apps-config/refs/heads/main/$SERVICE_NAME/application.yaml"
-curl --output app_config.yaml -sS $RAW_YAML_FROM_GH
-yq app_config.yaml -o=json > app_config.json
-kubectl create configmap test -n test --from-file=config_json=app_config.json
-rm -f app_config.yaml app_config.json
-
-# INFO log
-echo "configmap created - content:"
-kubectl get cm -o json -n test test | jq -r ".data.config_json"
-
 # create other resources
 kubectl create -f ./resources.yaml
 POD=$(kubectl get pod -n test -l app=demo -o jsonpath="{.items[0].metadata.name}")

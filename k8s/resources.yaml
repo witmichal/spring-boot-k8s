@@ -17,16 +17,11 @@ spec:
     spec:
       containers:
         - name: db-app
-          image: michalwit/boot-demo:001
+          image: michalwit/boot-demo:002
           ports:
             - containerPort: 8080
               name: s-boot-port
           env:
-            - name: SPRING_APPLICATION_JSON
-              valueFrom:
-                  configMapKeyRef:
-                    name: test
-                    key: config_json
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
