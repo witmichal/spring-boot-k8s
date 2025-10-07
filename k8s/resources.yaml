@@ -37,7 +37,7 @@ metadata:
   labels:
     app: demo
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: demo # looks up for pods with this label
   ports:

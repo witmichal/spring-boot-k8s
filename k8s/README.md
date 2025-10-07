@@ -75,3 +75,8 @@ minikube tunnel
 # it hits 127.0.0.1 (on default 80 port) and in k8s the post is still http://hello-world.example
 curl --resolve "hello-world.example:80:127.0.0.1" -i http://hello-world.example
 ```
+
+## busybox with curl
+```shell
+k run -n test busybox -i --tty --image=radial/busyboxplus:curl --restart=Never -- sh
+```

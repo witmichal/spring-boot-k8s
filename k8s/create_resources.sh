@@ -19,8 +19,9 @@ echo
 echo "stream logs (-f, --follow is for opening a stream):"
 echo "# k logs -f -n test services/demo"
 echo
-echo "CTRL+C to kill the tunnel process"
-echo "hit 'curl 127.0.0.1:6666' in separate shell"
+echo "To expose the service on localhost and port 6666"
+echo "kubectl port-forward service/demo -n test 6666:8888"
 echo
-
-#kubectl port-forward service/demo -n test 6666:8888
+echo "Test:"
+echo "curl 127.0.0.1:6666"
+echo
