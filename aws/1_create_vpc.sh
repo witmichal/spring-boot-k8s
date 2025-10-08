@@ -12,7 +12,7 @@ export AWS_REGION=eu-central-1
 export VPC_CF_STACK_NAME=VpcWithTwoPublicSubnetsForEks
 aws cloudformation create-stack \
 --stack-name $VPC_CF_STACK_NAME \
---template-body "file://amazon-eks-vpc-only-public-subnets.yaml" \
+--template-body "file://amazon-eks-vpc.yaml" \
 --region $AWS_REGION | xargs echo
 
 aws cloudformation wait stack-create-complete --stack-name $VPC_CF_STACK_NAME
