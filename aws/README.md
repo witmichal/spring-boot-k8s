@@ -29,12 +29,13 @@ else
 fi
 
 export AWS_REGION=eu-central-1
-export CLUSTER_NAME=michal-wit-training
-export VPC_CF_STACK_NAME=VpcWithOnePubAndOnePrivSubnetsForEks
+export VPC_CF_STACK_NAME=VpcWithTwoPublicSubnetsForEks
 aws cloudformation create-stack \
 --stack-name $VPC_CF_STACK_NAME \
---template-body "file://./aws/auto-mode/amazon-eks-vpc-private-and-public-subnets.yaml" \ 
+--template-body "file://./aws/amazon-eks-vpc-only-public-subnets.yaml" \
 --region $AWS_REGION
+
+aws cloudformation wait stack-create-complete --stack-name $VPC_CF_STACK_NAME
 ```
 
 2. create IAM role for EKS cluster:
@@ -66,6 +67,8 @@ aws iam attach-role-policy \
 aws iam attach-role-policy \
     --role-name $IAM_ROLE_FOR_EKS_CLUSTER \
     --policy-arn arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy
+    
+aws iam list-attached-role-policies --role-name $IAM_ROLE_FOR_EKS_CLUSTER | jq
 ```
 
 3. create IAM role for EKS node:
@@ -85,14 +88,19 @@ aws iam attach-role-policy \
 aws iam attach-role-policy \
     --role-name $IAM_ROLE_FOR_EKS_NODE \
     --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly
+
+aws iam list-attached-role-policies --role-name $IAM_ROLE_FOR_EKS_NODE | jq
 ```
 
 
 4. create EKS cluster:
 ```shell
+export CLUSTER_NAME=michal-wit-training
 export SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=$VPC_CF_STACK_NAM*" | jq -r '.Subnets | map(.SubnetId) | join(" ")')
 export RESOURCE_VPC_CONFIG=$(jq -nc '{subnetIds: ($ARGS.positional[0] | split(" ")),endpointPublicAccess:true,endpointPrivateAccess:true}' --args $SUBNET_IDS)
 export COMPUTE_CONFIG=$(jq -cn  --arg one 'Apple' --arg nodeRoleArn "$AWS_NODE_ROLE_ARN" '{enabled: true, nodeRoleArn: $nodeRoleArn, nodePools: ["general-purpose","system"]}')
+echo "compute-config:\t\t$COMPUTE_CONFIG\nresources-vpc-config:\t$RESOURCE_VPC_CONFIG"
+
 aws eks create-cluster \
   --region $AWS_REGION \
   --name $CLUSTER_NAME \
@@ -104,10 +112,7 @@ aws eks create-cluster \
   --storage-config '{"blockStorage": {"enabled": true}}' \
   --access-config '{"authenticationMode": "API"}'
   
-while [ "$(aws eks describe-cluster --name $CLUSTER_NAME | jq -r '.cluster.status')" != "ACTIVE" ]; do
-  aws eks describe-cluster --name $CLUSTER_NAME | jq -r '.cluster.status'
-  sleep 2
-done
+aws eks wait cluster-active --name $CLUSTER_NAME
 ```
 
 5. configure kubectl to communicate with newly created EKS cluster:
@@ -116,7 +121,17 @@ aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 kubectl cluster-info
 ```
 
-6. create ingress-nginx namespace and install ingress-nginx using helm:
+6. verify nodes (EC2 instances) are created lazily AND force a node to span up:
+```shell
+kubectl get nodes # no nodes yet - because no pod is deployed yet
+kubectl create namespace test
+kubectl run -n test busybox -i --tty --image=radial/busyboxplus:curl --restart=Never -- sh
+kubectl exec -n <name space here> <pod-name>  -it -- /bin/sh
+kubectl get nodes
+kubectl delete pods -n test busybox
+```
+
+7. create ingress-nginx namespace and install ingress-nginx using helm:
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm upgrade --install ingress-nginx ingress-nginx \
@@ -124,7 +139,16 @@ helm upgrade --install ingress-nginx ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace
 ```
-7. verify installation:
+8. verify installation:
 ```shell
 kubectl get all -n ingress-nginx
+kubectl get svc -n ingress-nginx # EXTERNAL-IP should be in "pending" state - because no ingress is created
+aws elb describe-load-balancers # no load balancer yet - because no ingress is created
+```
+
+9. create a sample deployment and service:
+```shell
+cd k8s
+./create_resources.sh
+cd ..
 ```
