@@ -1,3 +1,5 @@
+echo "VPN creation started:\n$(date)"
+
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text | xargs echo)
 if [[ $ACCOUNT_ID != "709931167372" ]]; then
   echo "set AWS_PROFILE to point to personal AWS account (709931167372) or configure AWS CLI"
@@ -14,3 +16,5 @@ aws cloudformation create-stack \
 --region $AWS_REGION | xargs echo
 
 aws cloudformation wait stack-create-complete --stack-name $VPC_CF_STACK_NAME
+
+echo "VPN creation finished:\n$(date)"

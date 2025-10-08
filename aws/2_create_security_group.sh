@@ -55,6 +55,8 @@ __create_security_group () {
     --output json | jq
 }
 
+echo "SG creation started:\n$(date)"
+
 VPC_NAME="VpcWithTwoPublicSubnetsForEks-VPC"
 VPC_ID=$(find_vpc_id_by_name_tag $VPC_NAME)
 SG_NAME="witm-training-sg-ssh-http-icmp"
@@ -65,3 +67,5 @@ echo "VPC_ID: $VPC_ID"
 echo "__create_security_group $SG_NAME $VPC_ID"
 __create_security_group $SG_NAME $VPC_ID
 # !create SECURITY GROUP
+
+echo "SG creation finished:\n$(date)"
