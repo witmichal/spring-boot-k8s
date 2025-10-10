@@ -12,7 +12,7 @@ export AWS_REGION=eu-central-1
 export IAM_ROLE_FOR_EKS_CLUSTER=AmazonEKSAutoClusterRole
 aws iam create-role \
     --role-name AmazonEKSAutoClusterRole \
-    --assume-role-policy-document "file://eks-cluster-role-trust-policy.json" \
+    --assume-role-policy-document "file://$HOME/personalspace/spring-boot-k8s/aws/create/eks-cluster-role-trust-policy.json" \
     --output json | jq
 
 # attach managed policies to the role
@@ -42,7 +42,7 @@ aws iam list-attached-role-policies --role-name $IAM_ROLE_FOR_EKS_CLUSTER --outp
 export IAM_ROLE_FOR_EKS_NODE=AmazonEKSAutoNodeRole
 aws iam create-role \
     --role-name $IAM_ROLE_FOR_EKS_NODE \
-    --assume-role-policy-document "file://eks-node-role-trust-policy.json" \
+    --assume-role-policy-document "file://$HOME/personalspace/spring-boot-k8s/aws/create/eks-node-role-trust-policy.json" \
     --output json | jq
 
 # attach managed policies to the role

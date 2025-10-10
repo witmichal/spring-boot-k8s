@@ -47,10 +47,10 @@ if [ -z "${SUBNET_NAME}" ] ; then
 fi
 
 KEY_NAME="demo-$(date "+%H-%M-%S")_key"
-import_key_pair $KEY_NAME "$HOME/personalspace/spring-boot-k8s/aws/aws_id_rsa.pub"
+import_key_pair $KEY_NAME "$HOME/personalspace/spring-boot-k8s/aws/create/aws_id_rsa.pub"
 
 echo "SSH:"
-echo "ssh -i \"$HOME/personalspace/spring-boot-k8s/aws/aws_id_rsa\" ec2-user@<BASTION_PUBLIC_IP>"
+echo "ssh -i \"$HOME/personalspace/spring-boot-k8s/aws/create/aws_id_rsa\" ec2-user@<BASTION_PUBLIC_IP>"
 echo "dig <LOAD_BALANCER_PUBLIC_DNS>"
 echo "curl --resolve \"hello-world.example:80:<LOAD_BALANCER_PUBLIC_IP>\" hello-world.example"
 
