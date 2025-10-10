@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-a
+  namespace: test
+  labels:
+    app: demo-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-a
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo-a
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:002
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-a
+                  key: db-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-a
+  namespace: test
+  labels:
+    app: demo-a
+spec:
+  type: NodePort # ClusterIP should not be exposed outside the cluster
+  selector:
+    app: demo-a # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-a
+  namespace: test
+type: Opaque
+data:
+  db-password: bXlwYXNzd29yZA==
+---
+### Second application (demo-b) ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-b
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-b
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo-b
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:002
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-b
+                  key: db-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-b
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  type: NodePort # ClusterIP should not be exposed outside the cluster
+  selector:
+    app: demo-b # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-b
+  namespace: test
+type: Opaque
+data:
+  db-password: c2VjcmV0cGFzcwo=
