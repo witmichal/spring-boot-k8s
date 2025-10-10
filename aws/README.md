@@ -1,3 +1,6 @@
+# Prerequisites
+1. install `helm`, `kubectl`, `aws`, `eksctl`
+
 ## Walkthrough
 
 ### Following resources (among others) will be created:

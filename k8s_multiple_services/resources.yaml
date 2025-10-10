@@ -36,7 +36,7 @@ metadata:
   labels:
     app: demo-a
 spec:
-  type: NodePort # ClusterIP should not be exposed outside the cluster
+  type: LoadBalancer # ClusterIP should not be exposed outside the cluster
   selector:
     app: demo-a # looks up for pods with this label
   ports:
@@ -92,7 +92,7 @@ metadata:
   labels:
     app: demo-b
 spec:
-  type: NodePort # ClusterIP should not be exposed outside the cluster
+  type: LoadBalancer # ClusterIP should not be exposed outside the cluster
   selector:
     app: demo-b # looks up for pods with this label
   ports:

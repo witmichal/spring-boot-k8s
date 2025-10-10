@@ -87,6 +87,16 @@ function describe() {
   kubectl get all -n test
 }
 
+function describe_instances(){
+  aws ec2 describe-instances --filters Name=instance-state-name,Values=running \
+  | jq '.Reservations[].Instances[] | {s:.SubnetId,v:.VpcId,pr:.PrivateIpAddress,pu:.PublicIpAddress,id:.InstanceId,tag0value:.Tags[0].Value}'
+}
+
+function get_load_balancers(){
+  aws elbv2 describe-load-balancers \
+      | jq -r '.LoadBalancers'
+}
+
 function help() {
   # misc
   section_line MISC
@@ -105,6 +115,13 @@ function help() {
   header "AWS" "Get AWS account connection details"
   _cmd 'aws configure list'
   _cmd 'aws sts get-caller-identity --output json | jq'
+  horizontal_line
+  header "AWS" "Describe ec2 instances"
+  _cmd 'describe_instances'
+  horizontal_line
+  header "AWS" "Get load balancers"
+  _cmd 'get_load_balancers'
+  _cmd "aws elbv2 describe-load-balancers | jq -r '.LoadBalancers'"
   # kubectl
   section_line kubectl
   header "kubectl" "Create k8s resources from STDIN (extracted from resources.yaml)"
