@@ -60,8 +60,3 @@ helm upgrade --install ingress-nginx ingress-nginx \
 
 kubectl get all -n ingress-nginx
 kubectl get svc -n ingress-nginx # EXTERNAL-IP should be in "pending" state - because no ingress is created
-aws elb describe-load-balancers | xargs echo # no load balancer yet - because no ingress is created
-
-cd ../k8s
-./create_resources.sh
-cd ..
