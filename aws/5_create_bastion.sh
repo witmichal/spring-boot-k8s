@@ -1,6 +1,7 @@
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/run_instance_with_key_pair.sh
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/vpc_functions/find_vpc_id_by_name_tag.sh
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/import_key_pair.sh
+source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/find_ec2_running_instance_by_name.sh
 
 SG_NAME="witm-training-sg-ssh-http-icmp"
 VPC_CF_STACK_NAME="VpcWithTwoPublicSubnetsForEks"
@@ -53,7 +54,9 @@ echo "ssh -i \"$HOME/personalspace/spring-boot-k8s/aws/aws_id_rsa\" ec2-user@<BA
 echo "dig <LOAD_BALANCER_PUBLIC_DNS>"
 echo "curl --resolve \"hello-world.example:80:<LOAD_BALANCER_PUBLIC_IP>\" hello-world.example"
 
-INSTANCE_ID=$(run_instance_with_key_pair bastion $SG_NAME $SUBNET_NAME $KEY_NAME)
+run_instance_with_key_pair bastion $SG_NAME $SUBNET_NAME $KEY_NAME
+
+INSTANCE_ID=$(find_ec2_running_instance_by_name bastion)
 
 aws ec2 describe-instances --instance-ids $INSTANCE_ID \
 | jq '.Reservations[0].Instances[0] | {s:.SubnetId,v:.VpcId,pr:.PrivateIpAddress,pu:.PublicIpAddress,id:.InstanceId}'

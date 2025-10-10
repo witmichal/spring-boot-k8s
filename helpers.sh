@@ -6,11 +6,30 @@
 # shellcheck disable=SC2051
 # shellcheck disable=SC2028
 
+function blue_line() {
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+
+  NUMBER_OF_DASHES=${1:-10}
+  pad=$(printf '%0.1s' "-"{1..$NUMBER_OF_DASHES})
+  printf "${BLUE}${pad}${NC}"
+}
+
+function section_line() {
+  LABEL_LENGTH_WITH_SPACES_AND_BRACKETS=$((${#1} + 4))
+  LINE_LENGTH=$(((70 - ${LABEL_LENGTH_WITH_SPACES_AND_BRACKETS})/2))
+  RED='\033[0;31m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+  LABEL="$(printf "%s [${RED}%s${NC}] %s" "$(blue_line $LINE_LENGTH)" "$1" "$(blue_line $LINE_LENGTH)")"
+  echo "$LABEL"
+}
+
 function horizontal_line() {
-  RED='\033[0;34m'
+  BLUE='\033[0;34m'
   NC='\033[0m' # No Color
   NUMBER_OF_DASHES=${1:-70}
-  printf -- "${RED}-%.0s" {1.."$NUMBER_OF_DASHES"}; echo "${NC}"
+  printf -- "${BLUE}-%.0s" {1.."$NUMBER_OF_DASHES"}; echo "${NC}"
 }
 
 function header() {
@@ -23,6 +42,10 @@ function _cmd() {
   GREEN='\033[1;32m'
   NC='\033[0m' # No Color
   echo "\t ${GREEN}$1${NC}"
+}
+
+function source_helpers() {
+  source $(git rev-parse --show-toplevel)/helpers.sh
 }
 
 function list_non_up_clusters() {
@@ -66,11 +89,24 @@ function describe() {
 
 function help() {
   # misc
-  horizontal_line
+  section_line MISC
   header "MISC" "Display function body"
   _cmd 'declare -f describe'
   horizontal_line
+  header "MISC" "Source helpers.sh"
+  _cmd 'source_helpers'
+  _cmd 'source $(git rev-parse --show-toplevel)/helpers.sh'
+  # GIT
+  section_line GIT
+  header "MISC" "Display function body"
+  _cmd 'git rev-parse --show-toplevel'
+  # AWS
+  section_line AWS
+  header "AWS" "Get AWS account connection details"
+  _cmd 'aws configure list'
+  _cmd 'aws sts get-caller-identity --output json | jq'
   # kubectl
+  section_line kubectl
   header "kubectl" "Create k8s resources from STDIN (extracted from resources.yaml)"
   _cmd 'extract_document Deployment | kubectl create -f -'
   horizontal_line
@@ -90,8 +126,8 @@ function help() {
   header "kubectl" "Cleanup resources created from resources.yaml"
   _cmd 'cleanup'
   _cmd 'kubectl delete -f resources.yaml'
-  horizontal_line
   # YAML
+  section_line YAML
   header "YAML" "Extract document from file with documents with different kinds"
   _cmd 'extract_document Secret'
   horizontal_line
