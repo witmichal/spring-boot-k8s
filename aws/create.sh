@@ -1,0 +1,1 @@
+$HOME/personalspace/spring-boot-k8s/aws/create/all.sh

@@ -1,0 +1,1 @@
+$HOME/personalspace/spring-boot-k8s/aws/cleanup/all.sh
