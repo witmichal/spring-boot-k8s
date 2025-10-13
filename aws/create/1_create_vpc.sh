@@ -1,3 +1,10 @@
+echo "Should whole infra by provisioned [y/n]:"
+read -s mainmenuinput
+case $mainmenuinput in
+    y) ;;
+    *) echo "Not provisioning anything."; return 0 ;;
+esac
+
 echo "VPN creation started:\n$(date)"
 
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text | xargs echo)
