@@ -16,13 +16,15 @@ eksctl utils associate-iam-oidc-provider --region=$AWS_REGION --cluster $CLUSTER
 
 export S3_READ_POLICY_ARN="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 
+########################
+## 1. IAM:
+########################
+
 # cleanup
 eksctl delete iamserviceaccount \
-  --name irsa-s3-reader-sa \
+  --name "$IAM_SERVICES_ACCOUNT_NAME" \
   --cluster "$CLUSTER_NAME" \
   --namespace "$TEST_NAMESPACE"
-
-## 1. IAM:
 
 # S3 reader Service Account
 # Trust policy is important (see 'Trust Relationships' tab in WEB console)
@@ -30,8 +32,7 @@ eksctl create iamserviceaccount \
   --name "$IAM_SERVICES_ACCOUNT_NAME" \
   --namespace "$TEST_NAMESPACE" \
   --cluster "$CLUSTER_NAME" \
-  --role-name $IAM_SERVICES_ACCOUNT_ROLE_NAME \
-  --role-only \
+  --role-name "$IAM_SERVICES_ACCOUNT_ROLE_NAME" \
   --attach-policy-arn "$S3_READ_POLICY_ARN" \
   --approve
 
@@ -46,15 +47,16 @@ aws iam get-role --role-name $IAM_SERVICES_ACCOUNT_ROLE_NAME \
 --role-name $IAM_SERVICES_ACCOUNT_ROLE_NAME \
 | jq
 
+########################
 ## 2. EKS:
-export SERVICE_ACCOUNT_NAME_FOR_S3="s3-s-a"
+########################
 
 ### create SA in k8s
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: "$SERVICE_ACCOUNT_NAME_FOR_S3"
+  name: "$IAM_SERVICES_ACCOUNT_NAME"
   namespace: "$TEST_NAMESPACE"
 EOF
 
@@ -67,7 +69,7 @@ IAM_ROLE_ARN=$(
 kubectl get serviceaccounts -n "$TEST_NAMESPACE" # just test output
 
 ### add annotation to SA
-kubectl annotate serviceaccount "$SERVICE_ACCOUNT_NAME_FOR_S3" \
+kubectl annotate serviceaccount "$IAM_SERVICES_ACCOUNT_NAME" \
 -n "$TEST_NAMESPACE" \
 eks.amazonaws.com/role-arn="$IAM_ROLE_ARN"
 
@@ -80,10 +82,13 @@ metadata:
   name: s3-access-test
   namespace: $TEST_NAMESPACE
 spec:
-  serviceAccountName: $SERVICE_ACCOUNT_NAME_FOR_S3
+  serviceAccountName: $IAM_SERVICES_ACCOUNT_NAME
   containers:
     - name: aws-cli
       image: amazon/aws-cli:latest
       command: ["/bin/sh", "-c"]
       args: ["sleep 3600"]
 EOF
+
+echo "kubectl exec -it s3-access-test -n $TEST_NAMESPACE -- /bin/sh"
+echo "aws s3api list-buckets"
