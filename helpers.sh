@@ -18,6 +18,7 @@ function blue_line() {
 function repo_root() {
   git rev-parse --show-toplevel
 }
+alias rr=repo_root
 
 function provision_aws() {
   $(repo_root)/aws/create/all.sh
@@ -109,6 +110,10 @@ function get_load_balancers(){
       | jq -r '.LoadBalancers'
 }
 
+function private_subnets(){
+  python $(rr)/py/find_vpc_id_by_name.py "VpcWithTwoPublicSubnetsForEks-VPC" | xargs -I {} python $(rr)/py/find_private_subnets.py {}
+}
+
 function help() {
   # misc
   section_line MISC
@@ -134,6 +139,9 @@ function help() {
   header "AWS" "Get load balancers"
   _cmd 'get_load_balancers'
   _cmd "aws elbv2 describe-load-balancers | jq -r '.LoadBalancers'"
+  horizontal_line
+  header "AWS" "Get private subnets for custom VPC"
+  _cmd 'private_subnets'
   # kubectl
   section_line kubectl
   header "kubectl" "Create k8s resources from STDIN (extracted from resources.yaml)"

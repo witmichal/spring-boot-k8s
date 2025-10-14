@@ -1,0 +1,29 @@
+[project]
+name = "spring-boot-k8s"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Michal Wit",email = "michal.wit@paramount.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.8.18"
+aws-okta-processor = "1.9.1"
+beautifulsoup4 = "4.12.3"
+boto3 = "1.34.75"
+python-ntlm = "1.1.0"
+python-ntlm3 = "1.0.2"
+requests = "2.31.0"
+requests-kerberos = "0.14.0"
+requests-ntlm = "1.2.0"
+tabulate = "0.9.0"
+tqdm = "4.66.2"
+awscli = "1.32.75"
+packaging = "25.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
