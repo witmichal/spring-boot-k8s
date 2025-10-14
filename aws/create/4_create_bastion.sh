@@ -3,8 +3,6 @@ source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/vpc_functions/fin
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/import_key_pair.sh
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/find_ec2_running_instance_by_name.sh
 
-SG_NAME="witm-training-sg-ssh-http-icmp"
-VPC_CF_STACK_NAME="VpcWithTwoPublicSubnetsForEks"
 
 VPC_NAME="VpcWithTwoPublicSubnetsForEks-VPC"
 VPC_ID=$(find_vpc_id_by_name_tag $VPC_NAME)
@@ -14,17 +12,10 @@ if [ -z "${VPC_ID}" ] ; then
    exit 1
 fi
 
-CLUSTER_NAME="michal-wit-training"
-AZ=$(
-aws ec2 describe-instances \
-  --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:aws:eks:cluster-name,Values=$CLUSTER_NAME" "Name=instance-state-name,Values=running" \
-  --query "Reservations[*].Instances[*].Placement.AvailabilityZone" \
-  --output text | xargs echo
-)
-
+echo $VPC_ID
 SUBNET_ID=$(
 aws ec2 describe-subnets \
-    --filters "Name=vpc-id,Values=$VPC_ID" "Name=availability-zone,Values=$AZ" "Name=tag:aws:cloudformation:logical-id,Values=PublicSubnet*"\
+    --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:aws:cloudformation:logical-id,Values=PublicSubnet*"\
     --query "Subnets[0].SubnetId" \
     --output text | xargs echo
 )
@@ -50,10 +41,14 @@ KEY_NAME="demo-$(date "+%H-%M-%S")_key"
 import_key_pair $KEY_NAME "$HOME/personalspace/spring-boot-k8s/aws/create/aws_id_rsa.pub"
 
 echo "SSH:"
+echo "user: 'ec2-user' - for AWS distributions / 'ubuntu' - for Ubuntu"
 echo "ssh -i \"$HOME/personalspace/spring-boot-k8s/aws/create/aws_id_rsa\" ec2-user@<BASTION_PUBLIC_IP>"
+echo "OR"
+echo "ssh -i \"$HOME/personalspace/spring-boot-k8s/aws/create/aws_id_rsa\" ubuntu@<BASTION_PUBLIC_IP>"
 echo "dig <LOAD_BALANCER_PUBLIC_DNS>"
 echo "curl --resolve \"hello-world.example:80:<LOAD_BALANCER_PUBLIC_IP>\" hello-world.example"
 
+SG_NAME="witm-training-sg-ssh-http-icmp"
 run_instance_with_key_pair bastion $SG_NAME $SUBNET_NAME $KEY_NAME
 
 INSTANCE_ID=$(find_ec2_running_instance_by_name bastion)

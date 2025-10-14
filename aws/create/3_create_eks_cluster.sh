@@ -1,6 +1,7 @@
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/ec2_functions/find_security_group_id_by_name_tag.sh
 source /Users/michal.wit/workspace/dev_util_scripts/awscli_env/vpc_functions/find_vpc_id_by_name_tag.sh
 
+SECURITY_GROUP_ID=$(find_security_group_id_by_name_tag witm-training-sg-ssh-http-icmp)
 
 export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text | xargs echo)
 if [[ $ACCOUNT_ID != "709931167372" ]]; then
@@ -47,7 +48,9 @@ echo "$PRIVATE_SUBNETS_ARRAY_1_AZ: { id: ${PRIVATE_SUBNETS_ARRAY[0]} }"
 echo "$PRIVATE_SUBNETS_ARRAY_2_AZ: { id: ${PRIVATE_SUBNETS_ARRAY[1]} }"
 
 INSTANCE_CLASS="m7i-flex.large"
-NODE_GROUP="michal-wit-node-group"
+NODE_GROUP_PREFIX="michal-wit-node-group"
+NODE_GROUP_1="$NODE_GROUP_PREFIX-1"
+NODE_GROUP_2="$NODE_GROUP_PREFIX-2"
 
 cat <<EOF | eksctl create cluster -f -
 apiVersion: eksctl.io/v1alpha5
@@ -64,33 +67,19 @@ vpc:
 iam:
   withOIDC: true  # Required for IRSA
 managedNodeGroups:
-  - name: $NODE_GROUP
+  - name: $NODE_GROUP_1
+    privateNetworking: true
     instanceType: $INSTANCE_CLASS
-    minSize: 2
-    desiredCapacity: 2
+    minSize: 1
+    desiredCapacity: 1
     subnets:
       - ${PRIVATE_SUBNETS_ARRAY[0]}
-      - ${PRIVATE_SUBNETS_ARRAY[1]}
+    securityGroups:
+      attachIDs:
+        - $SECURITY_GROUP_ID
 EOF
 
 aws eks wait cluster-active --name $CLUSTER_NAME
 
 aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 kubectl cluster-info
-
-HELLO_WORLD_POD=hello-world
-kubectl get nodes # no nodes yet - because no pod is deployed yet
-kubectl create namespace test
-kubectl run -n test $HELLO_WORLD_POD --image=registry.k8s.io/e2e-test-images/agnhost:2.53 --restart=Never
-kubectl wait --for=condition=Ready pod/$HELLO_WORLD_POD -n test --timeout=300s
-kubectl get nodes
-kubectl delete pods -n test $HELLO_WORLD_POD
-
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm upgrade --install ingress-nginx ingress-nginx \
-  --repo https://kubernetes.github.io/ingress-nginx \
-  --namespace ingress-nginx \
-  --create-namespace
-
-kubectl get all -n ingress-nginx
-kubectl get svc -n ingress-nginx # EXTERNAL-IP should be in "pending" state - because no ingress is created
