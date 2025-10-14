@@ -15,6 +15,18 @@ function blue_line() {
   printf "${BLUE}${pad}${NC}"
 }
 
+function repo_root() {
+  git rev-parse --show-toplevel
+}
+
+function provision_aws() {
+  $(repo_root)/aws/create/all.sh
+}
+
+function cleanup_aws() {
+  $(repo_root)/aws/cleanup/all.sh
+}
+
 function section_line() {
   LABEL_LENGTH_WITH_SPACES_AND_BRACKETS=$((${#1} + 4))
   LINE_LENGTH=$(((70 - ${LABEL_LENGTH_WITH_SPACES_AND_BRACKETS})/2))

@@ -1,3 +1,10 @@
+echo "Should whole infra by provisioned [y/n]:"
+read -s mainmenuinput
+case $mainmenuinput in
+    y) ;;
+    *) echo "Not provisioning anything."; exit 0 ;;
+esac
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 source "$SCRIPT_DIR"/1_create_vpc.sh
