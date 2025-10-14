@@ -11,3 +11,4 @@ source "$SCRIPT_DIR"/cleanup_0_bastions.sh
 source "$SCRIPT_DIR"/cleanup_1_iam_roles.sh
 source "$SCRIPT_DIR"/cleanup_2_security_groups.sh
 source "$SCRIPT_DIR"/cleanup_3_eks_cluster.sh
+source "$SCRIPT_DIR"/cleanup_4_vpc.sh
