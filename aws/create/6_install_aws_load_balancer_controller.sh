@@ -17,7 +17,7 @@ curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-cont
 
 aws iam create-policy \
     --policy-name $POLICY_NAME \
-    --policy-document "file://./iam_policy.json"
+    --policy-document "file://./iam_policy.json" || true
 
 # Error: unable to create iamserviceaccount(s) without IAM OIDC provider enabled
 eksctl utils associate-iam-oidc-provider --region=$AWS_REGION --cluster $CLUSTER_NAME --approve
@@ -29,7 +29,7 @@ eksctl create iamserviceaccount \
     --attach-policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/AWSLoadBalancerControllerIAMPolicy \
     --override-existing-serviceaccounts \
     --region $AWS_REGION \
-    --approve
+    --approve || true
 
 rm iam_policy.json
 

@@ -1,15 +1,15 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 function provision_vpc_and_eks(){
- # source "$SCRIPT_DIR"/1_create_vpc.sh
-  #source "$SCRIPT_DIR"/2_create_security_group.sh
+  source "$SCRIPT_DIR"/1_create_vpc.sh
+  source "$SCRIPT_DIR"/2_create_security_group.sh
   source "$SCRIPT_DIR"/3_create_eks_cluster.sh
   source "$SCRIPT_DIR"/4_create_bastion.sh
 }
 
 function provision_controllers(){
   source "$SCRIPT_DIR"/5_create_ingress_controller.sh
-  #source "$SCRIPT_DIR"/6_install_aws_load_balancer_controller.sh
+  source "$SCRIPT_DIR"/6_install_aws_load_balancer_controller.sh
 }
 
 function provision_irsa(){

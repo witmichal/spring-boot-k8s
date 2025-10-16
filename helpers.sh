@@ -115,25 +115,28 @@ function private_subnets(){
 }
 
 function tmux_k8s_events_pods_and_logs() {
-   pod_name=$1
-   # -d says not to attach to the session yet. top runs in the first
-   # window
-   tmux new-session -d kubectl logs -f -n test pods/$pod_name
-   #tmux new-session -d watch -n 1 kubectl get pods -n test
+    if [ $# -lt 1 ] ; then
+        echo "usage:"
+        printf "\n\t tmux_k8s_events_pods_and_logs {resource}\n"
+        printf "e.g: \n\t tmux_k8s_events_pods_and_logs pod/readiness-http\n"
+        printf "e.g: \n\t tmux_k8s_events_pods_and_logs service/demo-a\n"
+        return 1
+    fi
+    resource=$1
 
-   # In the most recently created session, split the (only) window
-   # and run htop in the new pane
-   tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
-   #tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
-   tmux resize-pane -D 12
+    # -d says not to attach to the session yet
+    tmux new-session -d kubectl logs -f -n test "$resource"
+    #tmux new-session -d watch -n 1 kubectl get pods -n test
 
-   # Split the new pane and run perl
-   tmux split-pane -h watch -n 1 kubectl get pods -n test #kubectl logs -f -n test pods/$pod_name on-failure-container # 3 panels
+    # In the most recently created session, split the (only) window
+    tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
+    tmux resize-pane -D 12
 
+    # Split the new pane
+    tmux split-pane -h watch -n 1 kubectl get pods -n test #kubectl logs -f -n test pods/$pod_name on-failure-container # 3 panels
 
-   #tmux select-layout even-vertical
-   tmux resize-pane -R 60
-   tmux attach-session
+    tmux resize-pane -R 60
+    tmux attach-session
  }
 
 function help() {
@@ -168,6 +171,9 @@ function help() {
   section_line kubectl
   header "kubectl" "Create k8s resources from STDIN (extracted from resources.yaml)"
   _cmd 'extract_document Deployment | kubectl create -f -'
+  horizontal_line
+  header "kubectl" "Current kubectl"
+  _cmd 'kubectl config current-context'
   horizontal_line
   header "kubectl" "Get kubectl contexts"
   _cmd 'list_non_up_clusters'

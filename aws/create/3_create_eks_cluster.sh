@@ -66,6 +66,8 @@ vpc:
       $PRIVATE_SUBNETS_ARRAY_2_AZ: { id: ${PRIVATE_SUBNETS_ARRAY[1]} }
 iam:
   withOIDC: true  # Required for IRSA
+autoModeConfig:
+  enabled: false
 managedNodeGroups:
   - name: $NODE_GROUP_1
     privateNetworking: true
