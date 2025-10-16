@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-a-deployment
+  namespace: test
+  labels:
+    app: demo-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-a
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo-a
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:008
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-a
+                  key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: app-name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-a
+  namespace: test
+  labels:
+    app: demo-a
+spec:
+  type: LoadBalancer # ClusterIP should not be exposed outside the cluster
+  selector:
+    app: demo-a # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-a-cm
+  namespace: test
+data:
+  app-name: "demo-a"
+  http-client-host: "demo-b:8888"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-a
+  namespace: test
+type: Opaque
+data:
+  db-password: bXlwYXNzd29yZA==
+---
+### Second application (demo-b) ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-b-deployment
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-b
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo-b
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:008
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-b
+                  key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: app-name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-b
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  type: LoadBalancer # ClusterIP should not be exposed outside the cluster
+  selector:
+    app: demo-b # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-b-cm
+  namespace: test
+data:
+  app-name: "demo-b"
+  http-client-host: "demo-a:8888" # test.svc.cluster.local svc.cluster.local cluster.local
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-b
+  namespace: test
+type: Opaque
+data:
+  db-password: c2VjcmV0cGFzcwo=

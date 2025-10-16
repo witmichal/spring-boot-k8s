@@ -12,16 +12,18 @@ kubectl create namespace test
 
 # create other resources
 kubectl create -f ./resources.yaml
+
 POD=$(kubectl get pod -n test -l app=demo -o jsonpath="{.items[0].metadata.name}")
 kubectl wait -n test --for=condition=Ready pods/$POD
 
 echo
-echo "stream logs (-f, --follow is for opening a stream):"
-echo "# k logs -f -n test services/demo"
+echo "### stream logs [TAIL] (-f, --follow is for opening a stream):"
+echo "k logs -f -n test services/demo"
 echo
-echo "To expose the service on localhost and port 6666"
-echo "kubectl port-forward service/demo -n test 6666:8888"
+echo "### 8080 is the SpringBoot port - exposed by PODs!"
+echo "### To expose the service on localhost and port 5555"
+echo "kubectl port-forward deployment/demo -n test 5555:8080"
 echo
-echo "Test:"
-echo "curl 127.0.0.1:6666"
+echo "### Test:"
+echo "curl 127.0.0.1:5555"
 echo
