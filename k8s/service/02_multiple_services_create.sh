@@ -11,7 +11,7 @@ set -e
 kubectl create namespace test
 
 # create other resources
-kubectl create -f ./02_multiple_services.yaml
+kubectl create --save-config -f ./02_multiple_services.yaml
 
 POD=$(kubectl get pod -n test -l app=demo-a -o jsonpath="{.items[0].metadata.name}")
 kubectl wait -n test --for=condition=Ready pods/$POD

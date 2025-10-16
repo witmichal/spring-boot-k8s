@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: db-app
-          image: michalwit/boot-demo:008
+          image: michalwit/boot-demo:009
           ports:
             - containerPort: 8080
               name: s-boot-port
@@ -92,7 +92,7 @@ spec:
     spec:
       containers:
         - name: db-app
-          image: michalwit/boot-demo:008
+          image: michalwit/boot-demo:009
           ports:
             - containerPort: 8080
               name: s-boot-port

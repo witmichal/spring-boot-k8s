@@ -10,6 +10,7 @@ echo "002 [DB_PASS in secret]"
 echo "003 [app name and HTTP client host in ConfigMap]"
 echo "004 [/health endpoint]"
 echo "005 [/health endpoint - changed | /ready endpoint added]"
+echo "009 Java DNS caching set to 1sec"
 
 ./gradlew build
 docker build -t michalwit/boot-demo:$1 .
