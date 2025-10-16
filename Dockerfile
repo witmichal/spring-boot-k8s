@@ -11,4 +11,4 @@ COPY jar/demo.jar /app/demo.jar
 EXPOSE 8080
 
 # Step 5: Define the command to run your Spring Boot application
-CMD ["java", "-jar", "/app/demo.jar"]
+CMD ["java", "-Dsun.net.inetaddr.ttl=1", "-jar", "/app/demo.jar"]

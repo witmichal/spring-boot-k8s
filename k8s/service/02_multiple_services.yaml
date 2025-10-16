@@ -51,7 +51,7 @@ spec:
     app: demo-a # looks up for pods with this label
   ports:
     - protocol: TCP
-      port: 8888
+      port: 80
       targetPort: s-boot-port
 ---
 apiVersion: v1
@@ -61,7 +61,7 @@ metadata:
   namespace: test
 data:
   app-name: "demo-a"
-  http-client-host: "demo-b:8888"
+  http-client-host: "demo-b" # demo-b / demo-b.test / demo-b.test.svc.cluster.local
 ---
 apiVersion: v1
 kind: Secret
@@ -126,7 +126,7 @@ spec:
     app: demo-b # looks up for pods with this label
   ports:
     - protocol: TCP
-      port: 8888
+      port: 80
       targetPort: s-boot-port
 ---
 apiVersion: v1
@@ -136,7 +136,7 @@ metadata:
   namespace: test
 data:
   app-name: "demo-b"
-  http-client-host: "demo-a:8888" # test.svc.cluster.local svc.cluster.local cluster.local
+  http-client-host: "demo-a" # demo-a / demo-a.test / demo-a.test.svc.cluster.local
 ---
 apiVersion: v1
 kind: Secret
