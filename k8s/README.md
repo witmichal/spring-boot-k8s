@@ -80,3 +80,11 @@ curl --resolve "hello-world.example:80:127.0.0.1" -i http://hello-world.example
 ```shell
 k run -n test busybox -i --tty --image=radial/busyboxplus:curl --restart=Never -- sh
 ```
+
+## Demo
+```shell
+minikube tunnel
+```
+```shell
+curl --resolve "hello-world.example:80:127.0.0.1" -i http://hello-world.example
+```
