@@ -114,6 +114,28 @@ function private_subnets(){
   python $(rr)/py/find_vpc_id_by_name.py "VpcWithTwoPublicSubnetsForEks-VPC" | xargs -I {} python $(rr)/py/find_private_subnets.py {}
 }
 
+function tmux_k8s_events_pods_and_logs() {
+   pod_name=$1
+   # -d says not to attach to the session yet. top runs in the first
+   # window
+   tmux new-session -d kubectl logs -f -n test pods/$pod_name
+   #tmux new-session -d watch -n 1 kubectl get pods -n test
+
+   # In the most recently created session, split the (only) window
+   # and run htop in the new pane
+   tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
+   #tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
+   tmux resize-pane -D 12
+
+   # Split the new pane and run perl
+   tmux split-pane -h watch -n 1 kubectl get pods -n test #kubectl logs -f -n test pods/$pod_name on-failure-container # 3 panels
+
+
+   #tmux select-layout even-vertical
+   tmux resize-pane -R 60
+   tmux attach-session
+ }
+
 function help() {
   # misc
   section_line MISC
@@ -170,5 +192,9 @@ function help() {
   horizontal_line
   header "YAML" "Extract document from file with multiple resources with same kind"
   _cmd 'extract_document_by_name Secret demo-b'
+  # TMUX
+  section_line TMUX
+  header "TMUX" "Dashboard for POD exercises"
+  _cmd 'tmux_k8s_events_pods_and_logs'
   horizontal_line
 }

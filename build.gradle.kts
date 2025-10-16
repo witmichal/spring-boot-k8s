@@ -25,6 +25,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.slf4j:slf4j-api:2.0.17")
+	implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
 }
 
 kotlin {

@@ -27,6 +27,16 @@ spec:
                 secretKeyRef:
                   name: demo-a
                   key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: app-name
 ---
 apiVersion: v1
 kind: Service
@@ -43,6 +53,15 @@ spec:
     - protocol: TCP
       port: 8888
       targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-a-cm
+  namespace: test
+data:
+  app-name: "demo-a"
+  http-client-host: "demo-b"
 ---
 apiVersion: v1
 kind: Secret
@@ -83,6 +102,16 @@ spec:
                 secretKeyRef:
                   name: demo-b
                   key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: app-name
 ---
 apiVersion: v1
 kind: Service
@@ -99,6 +128,15 @@ spec:
     - protocol: TCP
       port: 8888
       targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-b-cm
+  namespace: test
+data:
+  app-name: "demo-b"
+  http-client-host: "demo-a"
 ---
 apiVersion: v1
 kind: Secret

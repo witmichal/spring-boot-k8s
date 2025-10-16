@@ -3,3 +3,12 @@ GET http://localhost:8080/
 ###
 
 GET http://localhost:8080/call-service
+
+###
+
+GET http://localhost:8080/ready
+
+###
+
+GET http://localhost:8080/health
+Probe: intellij-http-file

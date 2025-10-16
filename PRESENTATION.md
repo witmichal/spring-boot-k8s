@@ -1,18 +1,20 @@
-1. What is Kubernetes?  https://kubernetes.io/docs/concepts/
-2. Architecture
+1. - [ ] What is Kubernetes?  https://kubernetes.io/docs/concepts/
+2. - [x] Architecture
 3. Live coding session
-   1.  - [ ] pod _[miniube]_
-   2.  - [ ] pod + deployment _[miniube]_
-   3.  - [ ] pod + deployment + service _[miniube]_
-   4.  - [ ] pod + deployment + service + ingress _[miniube]_
-   5.  [ ] provision EKS cluster
-   6. [ ] pod + deployment + service _[EKS]_
-   7. [ ] pod + deployment + service _[EKS]_
-   8. [ ] pod + deployment + service + ingress _[EKS]_
-   9. readinessProbe + livenessProbe
+   1.  pod _[miniube]
+   2. pod scheduling and binding
+   2. _pod + sidecar _[miniube]_
+   3. PodDisruptionBudget 
+   3. pod + deployment _[miniube]_
+   4. pod + deployment + service _[miniube]_
+   5. pod + deployment + service + ingress _[miniube]_
+   6. provision EKS cluster 
+   7. pod + deployment + service _[EKS]_
+   8. pod + deployment + service _[EKS]_
+   9. pod + deployment + service + ingress _[EKS]_
+   10. readinessProbe + livenessProbe
    10. PodDisruptionBudget
-   10. sidecar container
-   11. service account vs IRSA (IAM Roles for Service Accounts)
+    11. service account vs IRSA (IAM Roles for Service Accounts)
    
 
 AD 1
