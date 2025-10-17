@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo #1 the basis for the ReplicaSets and Pods which are created later
+  name: demo # the basis for the ReplicaSets and Pods which are created later
   namespace: test
   labels:
     app: demo
 spec:
-  replicas: 1 #2 ReplicaSet will be created
+  replicas: 4 # ReplicaSet will be created
   selector:
     matchLabels:
-      app: demo #3 (!) defines how the created ReplicaSet finds which Pods to manage # see #4
-  template: # Pod spec
+      app: demo
+  template: # Pod spec # only change to the `template` triggers a rollout!
     metadata:
       labels:
-        app: demo #4 (!) needs to match with #3 (more sophisticated mechanisms are available e.g. matchExpressions)
+        app: demo # with overlapping selectors some controllers might conflict and behave unexpectedly
     spec:
       containers:
         - name: db-app

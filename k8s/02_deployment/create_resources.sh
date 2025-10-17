@@ -11,7 +11,7 @@ set -e
 kubectl create namespace test
 
 # create other resources
-kubectl create -f ./resources.yaml
+kubectl create --save-config -f ./01_one_pod.yaml
 
 POD=$(kubectl get pod -n test -l app=demo -o jsonpath="{.items[0].metadata.name}")
 kubectl wait -n test --for=condition=Ready pods/$POD
@@ -23,6 +23,9 @@ echo
 echo "### 8080 is the SpringBoot port - exposed by PODs!"
 echo "### To expose the service on localhost and port 5555"
 echo "kubectl port-forward deployment/demo -n test 5555:8080"
+echo
+echo "### if that doesn't work - simply add a service:"
+echo "kubectl expose deployment/kubernetes-bootcamp --type=\"NodePort\" --port 5555"
 echo
 echo "### Test:"
 echo "curl 127.0.0.1:5555"
