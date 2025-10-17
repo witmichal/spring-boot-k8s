@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: aws-cli-authz
+  namespace: test
+spec:
+  serviceAccountName: irsa-s3-reader-s-a
+  containers:
+    - name: aws-cli-authz
+      image: amazon/aws-cli:latest
+      command: ["/bin/sh", "-c"]
+      args: ["sleep 3600"]
