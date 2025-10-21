@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "test-template.fullname" . }}
+  name: {{ include "helm-chart-demo.fullname" . }}
   namespace: test
   labels:
-    {{- include "test-template.labels" . | nindent 4 }}
+    {{- include "helm-chart-demo.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.deployment.replicaCount }}
   selector:
     matchLabels:
-      {{- include "test-template.selectorLabels" . | nindent 6 }}
+      {{- include "helm-chart-demo.selectorLabels" . | nindent 6 }}
   template: # Pod spec
     metadata:
       labels:
-        {{- include "test-template.labels" . | nindent 8 }}
+        {{- include "helm-chart-demo.labels" . | nindent 8 }}
     spec:
       containers:
         - name: db-app
@@ -25,15 +25,15 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "test-template.fullname" . }}
+                  name: {{ include "helm-chart-demo.fullname" . }}
                   key: db-password
             - name: HTTP_CLIENT_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "test-template.fullname" . }}
+                  name: {{ include "helm-chart-demo.fullname" . }}
                   key: http-client-host
             - name: APP_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: {{ include "test-template.fullname" . }}
+                  name: {{ include "helm-chart-demo.fullname" . }}
                   key: app-name

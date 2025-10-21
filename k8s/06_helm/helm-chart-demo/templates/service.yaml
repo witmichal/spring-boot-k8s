@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "test-template.fullname" . }}
+  name: {{ include "helm-chart-demo.fullname" . }}
   namespace: test
   labels:
-    {{- include "test-template.labels" . | nindent 4 }}
+    {{- include "helm-chart-demo.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   selector:
-    {{- include "test-template.selectorLabels" . | nindent 4 }}
+    {{- include "helm-chart-demo.selectorLabels" . | nindent 4 }}
   ports:
     - protocol: TCP
       port: {{ .Values.service.port }}

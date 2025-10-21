@@ -11,9 +11,9 @@ curl --resolve "hello-world.example:80:127.0.0.1" -i http://hello-world.example
 
 
 ```shell
-helm create test-template
+helm create helm-chart-demo
 
-cd test-template
+cd helm-chart-demo
 rm -fr tests
 rm -fr charts
 rm .helmignore # needed for helm packaging
