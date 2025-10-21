@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  namespace: test
+  labels:
+    app: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:002
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: test
+                  key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-a-cm
+                  key: app-name
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo
+  namespace: test
+  labels:
+    app: demo
+spec:
+  type: ClusterIP
+  selector:
+    app: demo # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-a-cm
+  namespace: test
+data:
+  app-name: "demo-a"
+  http-client-host: "demo-b"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: test
+  namespace: test
+type: Opaque
+data:
+  db-password: bXlwYXNzd29yZA==
+---
+### Second application (demo-b) ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-b-deployment
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-b
+  template: # Pod spec
+    metadata:
+      labels:
+        app: demo-b
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:009
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-b
+                  key: db-password
+            - name: HTTP_CLIENT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: http-client-host
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: test-b-cm
+                  key: app-name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-b
+  namespace: test
+  labels:
+    app: demo-b
+spec:
+  type: ClusterIP # ClusterIP should not be exposed outside the cluster
+  selector:
+    app: demo-b # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: s-boot-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-b-cm
+  namespace: test
+data:
+  app-name: "demo-b"
+  http-client-host: "demo-a" # demo-a / demo-a.test / demo-a.test.svc.cluster.local
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: demo-b
+  namespace: test
+type: Opaque
+data:
+  db-password: c2VjcmV0cGFzcwo=
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: test
+  labels:
+    app: demo
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: service-a
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-a
+                port:
+                  number: 80
+    - host: service-b
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: demo-b
+                port:
+                  number: 80
