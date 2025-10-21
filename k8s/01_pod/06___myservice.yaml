@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myservice-deployment
+  namespace: test
+  labels:
+    app: myservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myservice
+  template: # Pod spec
+    metadata:
+      labels:
+        app: myservice
+    spec:
+      containers:
+        - name: db-app
+          image: michalwit/boot-demo:009
+          ports:
+            - containerPort: 8080
+              name: s-boot-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice
+  namespace: test
+  labels:
+    app: myservice
+spec:
+  type: ClusterIP
+  selector:
+    app: myservice # looks up for pods with this label
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: s-boot-port

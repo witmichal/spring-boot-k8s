@@ -22,3 +22,20 @@ curl k8s-test-demoa-51d794a2b3-af7daa31cbb4c67b.elb.eu-central-1.amazonaws.com:8
 # minikube is buggy in terms of DNS and service discovery:
 kubectl logs --namespace=kube-system -l k8s-app=kube-dns
 ```
+
+
+```mermaid
+graph LR;
+  client([client])-. Service-managed <br> load balancer .->service[Service];
+  subgraph cluster
+  service-->pod1[Pod];
+  service-->pod2[Pod];
+  end
+  classDef plain fill:#ddd,stroke:#fff,stroke-width:4px,color:#000;
+  classDef k8s fill:#326ce5,stroke:#fff,stroke-width:4px,color:#fff;
+  classDef cluster fill:#fff,stroke:#bbb,stroke-width:2px,color:#326ce5;
+  class ingress,service,pod1,pod2 k8s;
+  class client plain;
+  class cluster cluster;
+
+```

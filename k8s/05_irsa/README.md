@@ -34,4 +34,7 @@ kubectl exec -it aws-cli-authz -n test -- cat /var/run/secrets/eks.amazonaws.com
 | xargs python $(rr)/py/decode_jwt.py \
 | jq '.iat, .exp' \
 | xargs -I {} date -r {}
+
+cat $AWS_ROLE_ARN
+cat $AWS_WEB_IDENTITY_TOKEN_FILE
 ```
