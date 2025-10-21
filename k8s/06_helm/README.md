@@ -15,6 +15,9 @@ helm create test-template
 
 cd test-template
 rm -fr tests
+rm -fr charts
+rm .helmignore # needed for helm packaging
+rm NOTES.txt # printed when chart is deployed
 
 helm template .
 
