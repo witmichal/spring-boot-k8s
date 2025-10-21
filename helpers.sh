@@ -53,8 +53,9 @@ function header() {
 
 function _cmd() {
   GREEN='\033[1;32m'
+  DARK_GRAY='\033[0;33m'
   NC='\033[0m' # No Color
-  echo "\t ${GREEN}$1${NC}"
+  echo "\t ${GREEN}$1${NC} ${DARK_GRAY}# $2${NC}"
 }
 
 function source_helpers() {
@@ -115,92 +116,134 @@ function private_subnets(){
 }
 
 function tmux_k8s_events_pods_and_logs() {
-    if [ $# -lt 1 ] ; then
-        echo "usage:"
-        printf "\n\t tmux_k8s_events_pods_and_logs {resource}\n"
-        printf "e.g: \n\t tmux_k8s_events_pods_and_logs pod/readiness-http\n"
-        printf "e.g: \n\t tmux_k8s_events_pods_and_logs service/demo-a\n"
-        return 1
-    fi
-    resource=$1
+  if [ $# -lt 1 ] ; then
+    echo "usage:"
+    printf "\n\t tmux_k8s_events_pods_and_logs {resource}\n"
+    printf "e.g: \n\t tmux_k8s_events_pods_and_logs pod/readiness-http\n"
+    printf "e.g: \n\t tmux_k8s_events_pods_and_logs service/demo-a\n"
+    return 1
+  fi
+  resource=$1
 
-    # -d says not to attach to the session yet
-    tmux new-session -d kubectl logs -f -n test "$resource"
-    #tmux new-session -d watch -n 1 kubectl get pods -n test
+  # -d says not to attach to the session yet
+  tmux new-session -d kubectl logs -f -n test "$resource"
+  #tmux new-session -d watch -n 1 kubectl get pods -n test
 
-    # In the most recently created session, split the (only) window
-    tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
-    tmux resize-pane -D 12
+  # In the most recently created session, split the (only) window
+  tmux split-window -v watch -n 1 kubectl events -n test # 2 panels
+  tmux resize-pane -D 12
 
-    # Split the new pane
-    tmux split-pane -h watch -n 1 kubectl get pods -n test #kubectl logs -f -n test pods/$pod_name on-failure-container # 3 panels
+  # Split the new pane
+  tmux split-pane -h watch -n 1 kubectl get pods -n test #kubectl logs -f -n test pods/$pod_name on-failure-container # 3 panels
 
-    tmux resize-pane -R 60
-    tmux attach-session
- }
+  tmux resize-pane -R 60
+  tmux attach-session
+}
+
+function tmux_deployment_rolling_update() {
+  # -d says not to attach to the session yet
+  tmux new-session -d
+  #tmux new-session -d watch -n 1 kubectl get pods -n test
+
+  # In the most recently created session, split the (only) window
+  tmux split-window -v watch -n 1 kubectl get rs -n test
+  tmux resize-pane -D 12
+
+  # Split the new pane
+  tmux split-pane -h watch -n 1 kubectl rollout status -n test deployment/demo
+
+  tmux select-pane -t 0
+  tmux split-pane -h watch -n 1 kubectl get pods --show-labels -n test
+
+  tmux select-pane -t 0
+  tmux split-pane -h watch -n 1 kubectl get deployments -n test
+
+  tmux resize-pane -R 60
+  tmux attach-session
+}
+
+function busybox_new() {
+  kubectl run -n test busybox -i --tty --image=radial/busyboxplus:curl --restart=Never -- sh
+}
+
+function busybox_connect() {
+  kubectl kubectl exec --stdin --tty -n test busybox -- /bin/sh
+}
 
 function help() {
   # misc
   section_line MISC
   header "MISC" "Display function body"
-  _cmd 'declare -f describe'
+  _cmd 'declare -f describe' 'misc'
   horizontal_line
   header "MISC" "Source helpers.sh"
-  _cmd 'source_helpers'
-  _cmd 'source $(git rev-parse --show-toplevel)/helpers.sh'
+  _cmd 'source_helpers' 'misc'
+  _cmd 'source $(git rev-parse --show-toplevel)/helpers.sh' 'misc'
   # GIT
   section_line GIT
   header "MISC" "Display function body"
-  _cmd 'git rev-parse --show-toplevel'
+  _cmd 'rr' 'git'
+  _cmd 'git rev-parse --show-toplevel' 'git'
   # AWS
   section_line AWS
   header "AWS" "Get AWS account connection details"
-  _cmd 'aws configure list'
-  _cmd 'aws sts get-caller-identity --output json | jq'
+  _cmd 'aws configure list' 'aws'
+  _cmd 'aws sts get-caller-identity --output json | jq' 'aws'
   horizontal_line
   header "AWS" "Describe ec2 instances"
-  _cmd 'describe_instances'
+  _cmd 'describe_instances' 'aws'
   horizontal_line
   header "AWS" "Get load balancers"
-  _cmd 'get_load_balancers'
-  _cmd "aws elbv2 describe-load-balancers | jq -r '.LoadBalancers'"
+  _cmd 'get_load_balancers' 'aws'
+  _cmd "aws elbv2 describe-load-balancers | jq -r '.LoadBalancers'" 'aws'
   horizontal_line
   header "AWS" "Get private subnets for custom VPC"
-  _cmd 'private_subnets'
+  _cmd 'private_subnets' 'aws'
   # kubectl
   section_line kubectl
+  header "kubectl" "Create busybox in 'test'"
+  _cmd 'extract_document Deployment | kubectl create -f -' 'kubectl'
+  _cmd 'kubectl run -n test busybox -i --tty --image=radial/busyboxplus:curl --restart=Never -- sh' 'kubectl'
+  horizontal_line
+  header "kubectl" "Connect to existing busybox in 'test'"
+  _cmd 'busybox_new' 'kubectl'
+  _cmd 'kubectl kubectl exec --stdin --tty -n test busybox -- /bin/sh' 'kubectl'
+  horizontal_line
   header "kubectl" "Create k8s resources from STDIN (extracted from resources.yaml)"
-  _cmd 'extract_document Deployment | kubectl create -f -'
+  _cmd 'extract_document Deployment | kubectl create -f -' 'kubectl'
   horizontal_line
   header "kubectl" "Current kubectl"
-  _cmd 'kubectl config current-context'
+  _cmd 'kubectl config current-context' 'kubectl'
   horizontal_line
   header "kubectl" "Get kubectl contexts"
-  _cmd 'list_non_up_clusters'
+  _cmd 'list_non_up_clusters' 'kubectl'
   horizontal_line
   header "kubectl" "Use personal EKS cluster"
-  _cmd 'kubectl config use-context $(get_personal_cluster_name)'
+  _cmd 'kubectl config use-context $(get_personal_cluster_name)' 'kubectl'
   horizontal_line
   header "kubectl" "Use minikube"
-  _cmd 'kubectl config use-context minikube'
+  _cmd 'kubectl config use-context minikube' 'kubectl'
   horizontal_line
   header "kubectl" "Describe resources in test namespace"
-  _cmd 'describe'
-  _cmd 'kubectl get all -n test'
+  _cmd 'describe' 'kubectl'
+  _cmd 'kubectl get all -n test' 'kubectl'
   horizontal_line
   header "kubectl" "Cleanup resources created from resources.yaml"
-  _cmd 'cleanup'
-  _cmd 'kubectl delete -f resources.yaml'
+  _cmd 'cleanup' 'kubectl'
+  _cmd 'kubectl delete -f resources.yaml' 'kubectl'
   # YAML
   section_line YAML
   header "YAML" "Extract document from file with documents with different kinds"
-  _cmd 'extract_document Secret'
+  _cmd 'extract_document Secret' 'yaml'
   horizontal_line
   header "YAML" "Extract document from file with multiple resources with same kind"
-  _cmd 'extract_document_by_name Secret demo-b'
+  _cmd 'extract_document_by_name Secret demo-b' 'yaml'
+  horizontal_line
+  header "YAML" "Get just one document from HELM teplate output"
+  _cmd "helm template . | yq e '. | select(.kind == \"Secret\")'" 'yaml'
   # TMUX
   section_line TMUX
-  header "TMUX" "Dashboard for POD exercises"
-  _cmd 'tmux_k8s_events_pods_and_logs'
+  header "TMUX" "Dashboard for POD exercises" 'tmux'
+  _cmd 'tmux_k8s_events_pods_and_logs' 'tmux'
   horizontal_line
 }

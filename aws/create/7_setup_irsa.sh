@@ -73,7 +73,7 @@ kubectl annotate serviceaccount "$IAM_SERVICES_ACCOUNT_NAME" \
 -n "$TEST_NAMESPACE" \
 eks.amazonaws.com/role-arn="$IAM_ROLE_ARN"
 
-kubectl describe sa -n "$TEST_NAMESPACE" s3-s-a # just test output
+kubectl describe sa -n "$TEST_NAMESPACE" "$IAM_SERVICES_ACCOUNT_NAME" # just test output
 
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
