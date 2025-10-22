@@ -9,8 +9,7 @@ argocd app create test \
 --repo 'https://github.com/witmichal/spring-boot-k8s.git' \
 --dest-namespace test \
 --dest-server https://kubernetes.default.svc \
---path k8s/06_helm/helm-chart-demo \
---parameter namespace=demo-app
+--path k8s/06_helm/helm-chart-demo
 ```
 3. synch app (deploy to cluster)
 ```shell
@@ -53,6 +52,11 @@ ARGO_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath
 ```shell
 argocd login localhost:8888 --username admin --password $ARGO_PASS
 argocd account update-password --current-password $ARGO_PASS --account admin --new-password secretpassword
+```
+
+### uninstall
+```shell
+kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v3.1.7/manifests/install.yaml
 ```
 
 ## ArgoCD CLI
