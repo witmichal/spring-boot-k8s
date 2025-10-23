@@ -25,11 +25,16 @@ python $(rr)/py/decode_jwt.py $(kubectl exec -it aws-cli-authz -n test -- cat /v
 
 #### Decode 'iat' and 'exp'
 ```shell
+# Automounting (by kubelet) of ServiceAccount's API credentials happens on /var/run/secrets/kubernetes.io/serviceaccount/token
 kubectl exec -it aws-cli-authz -n test -- cat /var/run/secrets/kubernetes.io/serviceaccount/token \
 | xargs python $(rr)/py/decode_jwt.py \
 | jq '.iat, .exp' \
 | xargs -I {} date -r {}
 
+kubectl exec -it aws-cli-authz -n test \ 
+-- echo "$AWS_DEFAULT_REGION, $AWS_REGION, $AWS_ROLE_ARN, $AWS_WEB_IDENTITY_TOKEN_FILE, $AWS_STS_REGIONAL_ENDPOINTS"
+
+# This volume is mounted by EKS web hook /var/run/secrets/eks.amazonaws.com/serviceaccount/token
 kubectl exec -it aws-cli-authz -n test -- cat /var/run/secrets/eks.amazonaws.com/serviceaccount/token \
 | xargs python $(rr)/py/decode_jwt.py \
 | jq '.iat, .exp' \
