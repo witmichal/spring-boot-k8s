@@ -27,4 +27,4 @@ GET http://localhost:8080/actuator/health/readiness
 
 ###
 
-GET http://localhost:8080/cpu-load/1000
+GET http://localhost:8080/cpu-load/times/20/length/10000000

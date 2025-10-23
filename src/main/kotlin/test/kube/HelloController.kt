@@ -77,9 +77,12 @@ class HelloController {
         return response
     }
 
-    @GetMapping("/cpu-load/{times}")
-    fun triggerCpu(@PathVariable("times") times: Int): ResponseEntity<String> {
-        encrypt(times)
+    @GetMapping("/cpu-load/times/{times}/length/{length}")
+    fun triggerCpu(
+        @PathVariable("times") times: Int,
+        @PathVariable("length") length: Int,
+    ): ResponseEntity<String> {
+        encrypt(times, length)
         return code(OK)
     }
 
@@ -91,16 +94,18 @@ class HelloController {
 
     private fun fromStartup() = Duration.between(appStartedAt, now())
 
-    private fun encrypt(times: Int) {
+    private fun encrypt(times: Int, length: Int) {
         val cipher = Cipher.getInstance("AES")
             .also {
                 it.init(
                     Cipher.ENCRYPT_MODE,
                     SecretKeySpec("Bar12345Bar12345".toByteArray(), "AES")
-                ) }
+                )
+            }
+        val uuidLength = 36
         repeat(times) {
             val toEncrypt = generateSequence { randomUUID().toString() }
-                .take(1000)
+                .take(length / uuidLength)
                 .joinToString()
                 .toByteArray()
             cipher.update(toEncrypt)

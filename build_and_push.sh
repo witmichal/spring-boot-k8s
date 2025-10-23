@@ -13,6 +13,7 @@ echo "005 [/health endpoint - changed | /ready endpoint added]"
 echo "009 Java DNS caching set to 1sec"
 echo "010 [/use-cup/1000] | actuator"
 echo "011 enable readinessstate and livenessstate"
+echo "012 [/cpu-load/times/20/length/1000] endpoint change"
 
 ./gradlew build
 docker build -t michalwit/boot-demo:$1 .

@@ -10,7 +10,7 @@ if __name__ == '__main__':
     futures = []
 
     for _ in range(number_of_threads ):
-        futures.append(pool.apply_async(requests.get, [f'{schema_and_host}/cpu-load/100']))
+        futures.append(pool.apply_async(requests.get, [f'{schema_and_host}/cpu-load/times/20/length/1000']))
 
 
     for future in futures:

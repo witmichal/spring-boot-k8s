@@ -17,7 +17,7 @@ if __name__ == '__main__':
     futures.append(pool.apply_async(get_cpu))
 
     for _ in range(number_of_threads - 1):
-        futures.append(pool.apply_async(requests.get, ['http://localhost:8080/cpu-load/1000']))
+        futures.append(pool.apply_async(requests.get, ['http://localhost:8080/cpu-load/times/20/length/1000']))
 
 
     for future in futures:
