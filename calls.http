@@ -12,3 +12,19 @@ GET http://localhost:8080/ready
 
 GET http://localhost:8080/health
 Probe: intellij-http-file
+
+###
+
+GET http://localhost:8080/actuator/metrics/system.cpu.usage
+
+###
+
+GET http://localhost:8080/actuator/health/liveness
+
+###
+
+GET http://localhost:8080/actuator/health/readiness
+
+###
+
+GET http://localhost:8080/cpu-load/1000

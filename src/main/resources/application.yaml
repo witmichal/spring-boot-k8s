@@ -8,3 +8,18 @@ http:
 
 database:
   password: "${DB_PASSWORD:default-db-pass}"
+
+management:
+  endpoint:
+    health:
+      probes.enabled: true
+      access: unrestricted
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true

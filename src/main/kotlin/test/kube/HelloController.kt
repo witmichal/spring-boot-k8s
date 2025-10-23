@@ -1,20 +1,25 @@
 package test.kube
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.OK
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestClient
+import java.security.Key
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
-import io.github.oshai.kotlinlogging.KotlinLogging
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.OK
-import org.springframework.web.bind.annotation.RequestHeader
+import java.util.UUID.randomUUID
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 
 private val logger = KotlinLogging.logger {}
 
@@ -72,6 +77,12 @@ class HelloController {
         return response
     }
 
+    @GetMapping("/cpu-load/{times}")
+    fun triggerCpu(@PathVariable("times") times: Int): ResponseEntity<String> {
+        encrypt(times)
+        return code(OK)
+    }
+
     private fun code(code: HttpStatus) = ResponseEntity<String>(code)
 
     private fun passedSinceStartup(seconds: Int): Boolean {
@@ -79,4 +90,20 @@ class HelloController {
     }
 
     private fun fromStartup() = Duration.between(appStartedAt, now())
+
+    private fun encrypt(times: Int) {
+        val cipher = Cipher.getInstance("AES")
+            .also {
+                it.init(
+                    Cipher.ENCRYPT_MODE,
+                    SecretKeySpec("Bar12345Bar12345".toByteArray(), "AES")
+                ) }
+        repeat(times) {
+            val toEncrypt = generateSequence { randomUUID().toString() }
+                .take(1000)
+                .joinToString()
+                .toByteArray()
+            cipher.update(toEncrypt)
+        }
+    }
 }
