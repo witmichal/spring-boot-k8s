@@ -16,6 +16,10 @@ function provision_irsa(){
   source "$SCRIPT_DIR"/7_setup_irsa.sh
 }
 
+function provision_keda(){
+  source "$SCRIPT_DIR"/8_install_keda.sh
+}
+
 echo "Should \n1. VPN \n2. EKS \n3. bastion be provisioned \n[y/n]:"
 read -s VPN_AND_EKS_AND_BASTION
 
@@ -37,5 +41,10 @@ esac
 
 case $IRSA in
     y) provision_irsa ;;
-    *) echo "Not provisioning controllers." ;;
+    *) echo "Not provisioning IRSA." ;;
+esac
+
+case $KEDA in
+    y) provision_keda ;;
+    *) echo "Not provisioning KEDA." ;;
 esac
