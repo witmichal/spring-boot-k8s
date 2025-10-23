@@ -22,11 +22,11 @@ spec:
     spec:
       containers:
         - name: db-app
-          image: michalwit/boot-demo:011
+          image: michalwit/boot-demo:013
           resources:
             requests: # required by Keda CPU scaller ('resources.requests' or 'resources.limits' is needed)
-              #memory: "128Mi"
-              cpu: "500m" # milliCPU (100m = 0.1) # fraction of available CPU cores on the node that the pod is scheduled on
+              memory: "128Mi"
+              cpu: "400m" # milliCPU (100m = 0.1) # fraction of available CPU cores on the node that the pod is scheduled on
           ports:
             - containerPort: 8080
               name: s-boot-port
@@ -41,12 +41,14 @@ spec:
     name: test-cpu-deployment
   minReplicaCount: 1 # Optional. Default: 0
   maxReplicaCount: 10
+  pollingInterval: 1 # default 30 - 30 s
+  cooldownPeriod: 10 # default 300 - 300 s
   triggers:
     - type: cpu
       # Allowed types are 'Utilization' or 'AverageValue'
       metricType: Utilization  # represented as a percentage of the requested value of the resource for the pods
       metadata:
-        value: "50"
+        value: "60"
 ---
 apiVersion: v1
 kind: Service
