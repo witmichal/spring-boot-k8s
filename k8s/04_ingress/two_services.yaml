@@ -1,19 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-ingress-two-services
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo
-  namespace: test
+  name: demo-a
+  namespace: test-ingress-two-services
   labels:
-    app: demo
+    app: demo-a
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: demo
+      app: demo-a
   template: # Pod spec
     metadata:
       labels:
-        app: demo
+        app: demo-a
     spec:
       containers:
         - name: db-app
@@ -25,7 +30,7 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: test
+                  name: demo-a
                   key: db-password
             - name: HTTP_CLIENT_HOST
               valueFrom:
@@ -42,14 +47,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: demo
-  namespace: test
+  name: demo-a
+  namespace: test-ingress-two-services
   labels:
-    app: demo
+    app: demo-a
 spec:
   type: ClusterIP
   selector:
-    app: demo # looks up for pods with this label
+    app: demo-a # looks up for pods with this label
   ports:
     - protocol: TCP
       port: 80
@@ -59,7 +64,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-a-cm
-  namespace: test
+  namespace: test-ingress-two-services
 data:
   app-name: "demo-a"
   http-client-host: "demo-b"
@@ -67,8 +72,8 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: test
-  namespace: test
+  name: demo-a
+  namespace: test-ingress-two-services
 type: Opaque
 data:
   db-password: bXlwYXNzd29yZA==
@@ -78,7 +83,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-b-deployment
-  namespace: test
+  namespace: test-ingress-two-services
   labels:
     app: demo-b
 spec:
@@ -118,7 +123,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: demo-b
-  namespace: test
+  namespace: test-ingress-two-services
   labels:
     app: demo-b
 spec:
@@ -134,7 +139,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-b-cm
-  namespace: test
+  namespace: test-ingress-two-services
 data:
   app-name: "demo-b"
   http-client-host: "demo-a" # demo-a / demo-a.test / demo-a.test.svc.cluster.local
@@ -143,7 +148,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: demo-b
-  namespace: test
+  namespace: test-ingress-two-services
 type: Opaque
 data:
   db-password: c2VjcmV0cGFzcwo=
@@ -153,7 +158,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: demo-ingress
-  namespace: test
+  namespace: test-ingress-two-services
   labels:
     app: demo
 spec:

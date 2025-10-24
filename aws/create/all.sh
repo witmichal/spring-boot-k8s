@@ -1,7 +1,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 function provision_vpc_and_eks(){
- # source "$SCRIPT_DIR"/1_create_vpc.sh
+  source "$SCRIPT_DIR"/1_create_vpc.sh
   source "$SCRIPT_DIR"/2_create_security_group.sh
   source "$SCRIPT_DIR"/3_create_eks_cluster.sh
   source "$SCRIPT_DIR"/4_create_bastion.sh
@@ -28,6 +28,9 @@ read -s CONTROLLERS
 
 echo "Should IRSA be setup [y/n]:"
 read -s IRSA
+
+echo "Should KEDA be setup [y/n]:"
+read -s KEDA
 
 case $VPN_AND_EKS_AND_BASTION in
     y) provision_vpc_and_eks ;;

@@ -1,8 +1,9 @@
 ```shell
 ###stream logs (-f, --follow is for opening a stream):
-kubectl logs -f -n test services/demo
+kubectl logs -f -n test-serice-multiple services/demo
 
-minikube service -n test demo
+minikube service -n test-serice-multiple demo-a
+minikube service -n test-serice-multiple demo-b
 
 ### Test:
 curl {URL_FROM_OUTPUT}

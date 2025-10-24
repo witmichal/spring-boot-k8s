@@ -196,6 +196,7 @@ function help() {
   header "AWS" "Get load balancers"
   _cmd 'get_load_balancers' 'aws'
   _cmd "aws elbv2 describe-load-balancers | jq -r '.LoadBalancers'" 'aws'
+  _cmd "get_load_balancers | jq '.[].DNSName'" 'aws'
   horizontal_line
   header "AWS" "Get private subnets for custom VPC"
   _cmd 'private_subnets' 'aws'

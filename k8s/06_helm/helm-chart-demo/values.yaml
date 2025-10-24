@@ -7,3 +7,5 @@ deployment:
 service:
   type: ClusterIP
   port: 80
+
+namespace: test-helm

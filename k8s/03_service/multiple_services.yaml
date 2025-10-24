@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-a-deployment
-  namespace: test
+  namespace: test-service-multiple
   labels:
     app: demo-a
 spec:
@@ -42,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: demo-a
-  namespace: test
+  namespace: test-service-multiple
   labels:
     app: demo-a
 spec:
@@ -58,7 +58,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-a-cm
-  namespace: test
+  namespace: test-service-multiple
 data:
   app-name: "demo-a"
   http-client-host: "demo-b" # demo-b / demo-b.test / demo-b.test.svc.cluster.local
@@ -67,7 +67,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: demo-a
-  namespace: test
+  namespace: test-service-multiple
 type: Opaque
 data:
   db-password: bXlwYXNzd29yZA==
@@ -77,7 +77,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-b-deployment
-  namespace: test
+  namespace: test-service-multiple
   labels:
     app: demo-b
 spec:
@@ -117,7 +117,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: demo-b
-  namespace: test
+  namespace: test-service-multiple
   labels:
     app: demo-b
 spec:
@@ -133,7 +133,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: test-b-cm
-  namespace: test
+  namespace: test-service-multiple
 data:
   app-name: "demo-b"
   http-client-host: "demo-a" # demo-a / demo-a.test / demo-a.test.svc.cluster.local
@@ -142,7 +142,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: demo-b
-  namespace: test
+  namespace: test-service-multiple
 type: Opaque
 data:
   db-password: c2VjcmV0cGFzcwo=
