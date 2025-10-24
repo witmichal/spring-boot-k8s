@@ -60,7 +60,7 @@ class HelloController {
     // App is considered HEALTHY 20 seconds after startup
     @GetMapping("/health")
     fun health(@RequestHeader("Probe", required = false) probe: String?): ResponseEntity<String> {
-        val response = if (passedSinceStartup(seconds = 20)) code(OK) else code(BAD_REQUEST)
+        val response = if (passedSinceStartup(seconds = 1)) code(OK) else code(BAD_REQUEST)
         logger.info {
             "/health [since app started: ${fromStartup().seconds}s] [$probe] -> ${response.statusCode.value()}"
         }
@@ -70,7 +70,7 @@ class HelloController {
     // App is considered READY 35 seconds after startup
     @GetMapping("/ready")
     fun ready(): ResponseEntity<String> {
-        val response = if (passedSinceStartup(seconds = 35)) code(OK) else code(BAD_REQUEST)
+        val response = if (passedSinceStartup(seconds = 2)) code(OK) else code(BAD_REQUEST)
         logger.info {
             "/ready [since app started: ${fromStartup().seconds}s] -> ${response.statusCode.value()}"
         }
