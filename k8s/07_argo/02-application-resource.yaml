@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test
+  name: test-helm-no-sync
   namespace: argocd # (!) note, that it's not the 'test' namespace
 spec:
   project: default
@@ -11,4 +11,4 @@ spec:
     path: k8s/06_helm/helm-chart-demo
   destination:
     server: https://kubernetes.default.svc
-    namespace: test
+    namespace: test-helm

@@ -1,3 +1,10 @@
+```shell
+kubectl config use-context minikube
+kubectl port-forward svc/argocd-server -n argocd 8888:443
+kubectl apply 
+```
+
+
 # Usage
 ### create an Application in ArgoCD
 
@@ -5,9 +12,9 @@
 2. execute `argocd app create`
 ```shell
 #argocd app delete app-with-db
-argocd app create test \
+argocd app create test-helm \
 --repo 'https://github.com/witmichal/spring-boot-k8s.git' \
---dest-namespace test \
+--dest-namespace test-helm \
 --dest-server https://kubernetes.default.svc \
 --path k8s/06_helm/helm-chart-demo
 ```
