@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         {{- include "helm-chart-demo.labels" . | nindent 8 }}
+        test-label: test-value
     spec:
       containers:
         - name: db-app
